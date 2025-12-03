@@ -3,31 +3,26 @@ import random
 
 def get_personnages(db):
     """Retourne tous les personnages depuis MongoDB"""
-    return list(db.personnages.find())
-
+    return list(db.personnage.find())
 
 def get_monstres(db):
     """Retourne tous les monstres depuis MongoDB"""
     return list(db.monstres.find())
-
 
 def afficher_personnages(personnages):
     """Affiche la liste des personnages avec des numéros"""
     for i, perso in enumerate(personnages, start=1):
         print(f"{i}. {perso['nom']}")
 
-
 def afficher_selection_personnages(selection):
     print("=== Vos personnages sélectionnés ===")
     for perso in selection:
         print(f"- {perso['nom']}")
 
-
 def afficher_selection_monstres(selection):
     print("=== Monstres sélectionnés ===")
     for m in selection:
         print(f"- {m['nom']}")
-
 
 def verif_input(user_input, max_choice):
     """Vérifie que l'entrée utilisateur est un numéro correct"""
@@ -67,18 +62,17 @@ def select_personnages(personnages):
 
 
 def select_monstres(monstres):
-    """Sélectionne 3 monstres aléatoirement"""
+    """Sélectionne 3 monstres aléatoirement (ou moins si base vide)"""
+    count = len(monstres)
+
     return random.sample(monstres, 3)
+
 
 def choix_perso(db):
     print("Lancement d'une nouvelle game...")
     print("Choisissez 3 personnages parmi cette liste :")
 
     personnages = get_personnages(db)
-
-    if not personnages:
-        print("Aucun personnage trouvé dans la base de données.")
-        return []
 
     afficher_personnages(personnages)
 
@@ -92,8 +86,8 @@ def choix_monstre(db):
     print("Sélection aléatoire de 3 monstres...")
 
     monstres = get_monstres(db)
-    selection = select_monstres(monstres)
 
+    selection = select_monstres(monstres)
     afficher_selection_monstres(selection)
 
     return selection
@@ -104,3 +98,7 @@ def lancer_game(db):
 
     personnages = choix_perso(db)
     monstres = choix_monstre(db)
+
+
+    print("Début de la Partie !!")
+
