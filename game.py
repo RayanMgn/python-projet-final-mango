@@ -43,10 +43,6 @@ def select_personnages(personnages):
 
     return selection
 
-def select_monstres(monstres):
-    return random.sample(monstres, 3)
-
-
 def choix_perso(db):
     print("Choisissez 3 personnages :")
     personnages = get_personnages(db)

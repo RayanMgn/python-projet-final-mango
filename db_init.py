@@ -36,17 +36,13 @@ monstr = [
 
 db = get_database()
 
-# Nettoyage (optionnel)
 db.personnage.drop()
 db.monstres.drop()
-
 
 db.personnage.insert_many(perso)
 db.monstres.insert_many(monstr)
 
 print("Base de données remplie avec succès !")
-
-
 
 if __name__ == "__main__":
     db = get_database()
