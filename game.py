@@ -88,6 +88,8 @@ def combat(personnages, monstre):
 def lancer_game(db):
     print("Nouvelle partie")
 
+    joueur = input("Entrez votre nom de joueur : ")
+
     personnages = choix_perso(db)
     vague = 1
 
@@ -95,22 +97,43 @@ def lancer_game(db):
         print(f"VAGUE {vague}")
 
         monstre = choix_monstre(db)
+
+        if monstre is None:
+            print("Victoire Suprême ! Vous avez vaincu tous les monstres !")
+            break
+
         print(f"Monstre : {monstre.nom} (PV:{monstre.PV})")
 
         victoire = combat(personnages, monstre)
 
         if victoire:
+            db.monstres.delete_one({"_id": monstre.id})
+
+            if db.monstres.count_documents({}) == 0:
+                print("Victoire Suprême ! Vous avez vaincu toutes les vagues de monstres !")
+                break
+
             print(f"Vague {vague} réussie !")
             vague += 1
+
         else:
+            print("Vous avez perdu…")
             break
 
-    print(f"FIN DU JEU !")
-    print(f"Scores vagues : {vague - 1}")
+    print("FIN DU JEU !")
+    print(f"{joueur}, vous avez survécu à {vague - 1} vagues.")
 
-    db.scores.insert_one({"vagues": vague - 1})
+    db.scores.insert_one({"joueur": joueur, "vagues": vague - 1})
+
 
 def afficher_scores(db):
     print("Scores précédents :")
+
     for score in db.scores.find().sort("vagues", -1).limit(3):
-        print(f"- {score['vagues']} vagues")
+
+        joueur = score.get("joueur", "Inconnu")
+        vagues = score.get("vagues", 0)
+
+        print(f" {joueur} - {vagues} vagues")
+    line()
+
