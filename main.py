@@ -24,20 +24,19 @@ def main():
 
         choix = get_valid_input(3)
 
-        print(f"VFaites votre choix :")
-
-        if choix == '1':
+        if choix == 1:
             lancer_game(db)
 
-        elif choix == "2":
+        elif choix == 2:
             afficher_scores(db)
 
-        elif choix == "3":
+        elif choix == 3:
             print("Fermeture de l’application. À bientôt !")
             sys.exit(0)
 
         else:
             print("Choix invalide. Veuillez réessayer.")
+
 
 if __name__ == "__main__":
     main()
