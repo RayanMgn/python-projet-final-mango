@@ -17,8 +17,8 @@ perso = [
     {"nom": "Sorcier", "ATK": 25, "DEF": 3,  "PV": 70},
     {"nom": "Chevalier", "ATK": 17, "DEF": 15, "PV": 120},
     {"nom": "Moine", "ATK": 19, "DEF": 9,  "PV": 95},
-    {"nom": "Berserker", "ATK": 23, "DEF": 16,  "PV": 155},
-    {"nom": "Chasseur", "ATK": 30, "DEF": 20, "PV": 400},
+    {"nom": "Berserker", "ATK": 23, "DEF": 16,  "PV": 30},
+    {"nom": "Chasseur", "ATK": 30, "DEF": 20, "PV": 150},
 ]
 
 monstr = [
