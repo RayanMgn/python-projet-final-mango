@@ -1,104 +1,120 @@
 from db_init import get_database
+from models import Personnage, Monstre
 import random
+from utils import line, get_valid_input
+
 
 def get_personnages(db):
-    """Retourne tous les personnages depuis MongoDB"""
-    return list(db.personnage.find())
+    return [Personnage.from_dict(p) for p in db.personnage.find()]
 
 def get_monstres(db):
-    """Retourne tous les monstres depuis MongoDB"""
-    return list(db.monstres.find())
+    return [Monstre.from_dict(m) for m in db.monstres.find()]
+
 
 def afficher_personnages(personnages):
-    """Affiche la liste des personnages avec des numéros"""
     for i, perso in enumerate(personnages, start=1):
-        print(f"{i}. {perso['nom']}")
+        print(f"{i}. {perso.nom} (ATK:{perso.ATK}, DEF:{perso.DEF}, PV:{perso.PV})")
 
 def afficher_selection_personnages(selection):
-    print("=== Vos personnages sélectionnés ===")
+    print("Vos personnages :")
     for perso in selection:
-        print(f"- {perso['nom']}")
+        print(f"- {perso.nom} (PV: {perso.PV})")
 
-def afficher_selection_monstres(selection):
-    print("=== Monstres sélectionnés ===")
-    for m in selection:
-        print(f"- {m['nom']}")
+def afficher_selection_monstres(monstres):
+    print("Monstres choisi :")
+    for m in monstres:
+        print(f"- {m.nom} (PV:{m.PV}, ATK:{m.ATK}, DEF:{m.DEF})")
 
-def verif_input(user_input, max_choice):
-    """Vérifie que l'entrée utilisateur est un numéro correct"""
-    try:
-        num = int(user_input)
-    except ValueError:
-        print("Veuillez entrer un numéro valide.")
-        return None
 
-    if not (1 <= num <= max_choice):
-        print("Veuillez entrer un numéro valide.")
-        return None
-
-    return num
+        
 
 def select_personnages(personnages):
-    """Permet à l'utilisateur de sélectionner 3 personnages"""
-
     selection = []
 
     while len(selection) < 3:
-        choix = input(f"Sélection {len(selection)+1}/3 → Entrez un numéro : ")
-
-        numero = verif_input(choix, len(personnages))
-        if numero is None:
-            continue
-
+        numero = get_valid_input(len(personnages))
         perso = personnages[numero - 1]
 
         if perso in selection:
-            print("Ce personnage est déjà sélectionné.")
+            print("Déjà sélectionné.")
         else:
             selection.append(perso)
-            print(f"Ajouté : {perso['nom']}")
+            print(f"{perso.nom} ajouté.")
 
     return selection
 
-
 def select_monstres(monstres):
-    """Sélectionne 3 monstres aléatoirement (ou moins si base vide)"""
-    count = len(monstres)
-
     return random.sample(monstres, 3)
 
 
 def choix_perso(db):
-    print("Lancement d'une nouvelle game...")
-    print("Choisissez 3 personnages parmi cette liste :")
-
+    print("Choisissez 3 personnages :")
     personnages = get_personnages(db)
-
     afficher_personnages(personnages)
-
     selection = select_personnages(personnages)
     afficher_selection_personnages(selection)
-
     return selection
-
 
 def choix_monstre(db):
-    print("Sélection aléatoire de 3 monstres...")
-
     monstres = get_monstres(db)
+    return random.choice(monstres)
 
-    selection = select_monstres(monstres)
-    afficher_selection_monstres(selection)
 
-    return selection
+def gestion_degats(attaquant, defenseur):
+    degats = max(1, attaquant.ATK - defenseur.DEF)
+    defenseur.PV -= degats
+    line()
+    print(f"{attaquant.nom} inflige {degats} dégâts à {defenseur.nom}. (PV restant : {defenseur.PV})")
+    line()
+
+def combat(personnages, monstre):
+    print(f"fight !!! 3 perso VS {monstre.nom}")
+    line()
+
+
+    while True:
+        for p in personnages:
+            if p.PV > 0:
+                gestion_degats(p, monstre)
+                if monstre.PV <= 0:
+                    print(f"Le monstre {monstre.nom} est vaincu !")
+                    return True
+
+        perso_vivant = [p for p in personnages if p.PV > 0]
+        if len(perso_vivant) == 0:
+            print("Les 3 personnages sont morts...")
+            return False
+
+        cible = random.choice(perso_vivant)
+        gestion_degats(monstre, cible)
 
 
 def lancer_game(db):
-    print("Lancement d'une nouvelle game...")
+    print("Nouvelle partie")
 
     personnages = choix_perso(db)
-    monstres = choix_monstre(db)
+    vague = 1
 
+    while True:
+        print(f"VAGUE {vague}")
 
-    print("Début de la Partie !!")
+        monstre = choix_monstre(db)
+        print(f"Monstre : {monstre.nom} (PV:{monstre.PV})")
 
+        victoire = combat(personnages, monstre)
+
+        if victoire:
+            print(f"Vague {vague} réussie !")
+            vague += 1
+        else:
+            break
+
+    print(f"FIN DU JEU !")
+    print(f"Scores vagues : {vague - 1}")
+
+    db.scores.insert_one({"vagues": vague - 1})
+
+def afficher_scores(db):
+    print("Scores précédents :")
+    for score in db.scores.find().sort("vagues", -1).limit(3):
+        print(f"- {score['vagues']} vagues")
