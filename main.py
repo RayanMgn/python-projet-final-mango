@@ -1,18 +1,24 @@
 from db_init import get_database
 import sys
 from game import lancer_game
-
-def afficher_scores():
-    print("Affichage des scores...")
+from game import afficher_scores
+from utils import line
+def print_menu():
+    print(" Menu Principal ")
+    line()    
+    print("1. Lancer une game")
+    line()
+    print("2. Afficher les scores")
+    line()
+    print("3. Quitter")
+    line()
 
 def main():
     db = get_database() 
 
     while True:
-        print("=== Menu ToDo ===")
-        print("1. Lancer une game")
-        print("2. Afficher les scores")
-        print("3. Quitter")
+        
+        print_menu()
 
         choice = input("Entrez votre choix : ")
 
@@ -27,7 +33,7 @@ def main():
             sys.exit(0)
 
         else:
-            print("Choix invalide. Veuillez réessayer.\n")
+            print("Choix invalide. Veuillez réessayer.")
 
 if __name__ == "__main__":
     main()
