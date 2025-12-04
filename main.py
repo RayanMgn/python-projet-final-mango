@@ -3,6 +3,8 @@ import sys
 from game import lancer_game
 from game import afficher_scores
 from utils import line
+from utils import get_valid_input
+
 def print_menu():
     print(" Menu Principal ")
     line()    
@@ -20,15 +22,17 @@ def main():
         
         print_menu()
 
-        choice = input("Entrez votre choix : ")
+        choix = get_valid_input(3)
 
-        if choice == '1':
+        print(f"VFaites votre choix :")
+
+        if choix == '1':
             lancer_game(db)
 
-        elif choice == "2":
+        elif choix == "2":
             afficher_scores(db)
 
-        elif choice == "3":
+        elif choix == "3":
             print("Fermeture de l’application. À bientôt !")
             sys.exit(0)
 
