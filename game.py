@@ -26,7 +26,6 @@ def afficher_selection_monstres(monstres):
         print(f"- {m.nom} (PV:{m.PV}, ATK:{m.ATK}, DEF:{m.DEF})")
 
 
-        
 
 def select_personnages(personnages):
     selection = []
@@ -66,7 +65,7 @@ def gestion_degats(attaquant, defenseur):
 def combat(personnages, monstre):
     print(f"fight !!! 3 perso VS {monstre.nom}")
     line()
-
+    db = get_database()
 
     while True:
         for p in personnages:
@@ -74,6 +73,7 @@ def combat(personnages, monstre):
                 gestion_degats(p, monstre)
                 if monstre.PV <= 0:
                     print(f"Le monstre {monstre.nom} est vaincu !")
+                    db.monstres.delete_one({"nom": monstre.nom})
                     return True
 
         perso_vivant = [p for p in personnages if p.PV > 0]
